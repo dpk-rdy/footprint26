@@ -1,0 +1,8 @@
+factor_id,description,value,unit,source_note
+air_short_haul,Flight under 1500 km with RF uplift,0.246,kgCO2e per passenger-km,DEFRA/BEIS 2024 short-haul avg with RF; replace with chosen authority
+air_long_haul,Flight over 1500 km with RF uplift,0.151,kgCO2e per passenger-km,DEFRA/BEIS 2024 long-haul avg with RF
+rail_intercity,Intercity rail,0.035,kgCO2e per passenger-km,DEFRA 2024 national rail
+coach_bus,Long-distance coach,0.027,kgCO2e per passenger-km,DEFRA 2024 coach
+car_petrol_avg,Average car single occupant,0.170,kgCO2e per passenger-km,DEFRA 2024 avg car; divide by occupancy for carpool
+hotel_night,Hotel room-night mid-tier North America,16.5,kgCO2e per room-night,Cornell Hotel Sustainability Benchmarking 2023 NA avg
+radiative_forcing_multiplier,Aviation non-CO2 uplift on flight CO2,1.9,multiplier,IPCC consensus range 1.7-2.0

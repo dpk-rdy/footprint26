@@ -1,0 +1,17 @@
+venue_id,stadium,city,country,lat,lon,capacity,matches,grid_intensity_kgco2_per_kwh
+ATL,Mercedes-Benz Stadium,Atlanta,USA,33.7553,-84.4006,71000,9,0.379
+ARL,AT&T Stadium,Arlington (Dallas),USA,32.7473,-97.0945,80000,9,0.401
+NYNJ,MetLife Stadium,East Rutherford (NY/NJ),USA,40.8135,-74.0745,82500,8,0.245
+LA,SoFi Stadium,Inglewood (Los Angeles),USA,33.9535,-118.3392,70240,8,0.221
+BOS,Gillette Stadium,Foxborough (Boston),USA,42.0909,-71.2643,65878,6,0.252
+SEA,Lumen Field,Seattle,USA,47.5952,-122.3316,68740,6,0.094
+MIA,Hard Rock Stadium,Miami Gardens,USA,25.9580,-80.2389,65326,7,0.401
+KC,Arrowhead Stadium,Kansas City,USA,39.0489,-94.4839,76416,6,0.512
+HOU,NRG Stadium,Houston,USA,29.6847,-95.4107,72220,7,0.401
+PHI,Lincoln Financial Field,Philadelphia,USA,39.9008,-75.1675,69596,6,0.298
+SF,Levi's Stadium,Santa Clara (SF Bay),USA,37.4030,-121.9700,68500,6,0.221
+MEX,Estadio Azteca,Mexico City,Mexico,19.3029,-99.1505,87523,5,0.431
+GDL,Estadio Akron,Guadalajara,Mexico,20.6817,-103.4628,49850,4,0.431
+MTY,Estadio BBVA,Monterrey,Mexico,25.6694,-100.2444,53500,4,0.431
+TOR,BMO Field,Toronto,Canada,43.6332,-79.4185,45000,7,0.110
+VAN,BC Place,Vancouver,Canada,49.2768,-123.1119,54500,6,0.013

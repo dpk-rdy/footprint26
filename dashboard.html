@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Footprint 26: World Cup 2026 Cost & Carbon Explorer</title>
+<style>
+  :root{
+    --green:#1B7A4B; --ink:#14342A; --grey:#5A6B62; --amber:#B5651D;
+    --bg:#f6f9f7; --card:#ffffff; --line:#e2ebe6; --red:#c0392b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;padding:24px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{border-bottom:3px solid var(--amber);padding-bottom:16px;margin-bottom:24px}
+  h1{font-size:30px;color:var(--green);letter-spacing:-0.5px}
+  .sub{color:var(--grey);font-size:15px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}body{padding:14px}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;
+    box-shadow:0 1px 3px rgba(20,52,42,.05)}
+  .card h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--grey);margin-bottom:12px}
+  label{display:block;font-size:13px;color:var(--grey);margin:10px 0 4px}
+  select,input[type=range]{width:100%}
+  select{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff}
+  .seq{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{background:#eaf4ee;border:1px solid var(--green);color:var(--green);border-radius:999px;
+    padding:4px 10px;font-size:13px;cursor:pointer;user-select:none}
+  .chip.off{background:#fff;border-color:var(--line);color:var(--grey)}
+  .big{font-size:40px;font-weight:700;line-height:1}
+  .unit{font-size:14px;color:var(--grey);font-weight:400}
+  .bars{margin-top:8px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .bar-label{width:150px;font-size:13px;color:var(--ink);flex-shrink:0}
+  .bar-track{flex:1;background:#eef3f0;border-radius:6px;overflow:hidden;height:26px;position:relative}
+  .bar-fill{height:100%;border-radius:6px;transition:width .4s ease}
+  .bar-val{position:absolute;right:8px;top:0;line-height:26px;font-size:12px;font-weight:600;color:#fff}
+  .gauge-wrap{text-align:center;padding-top:6px}
+  .note{font-size:12px;color:var(--grey);margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--grey);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.4px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+  .full{grid-column:1/-1}
+  .lede{background:#eaf4ee;border-left:4px solid var(--green);padding:12px 16px;border-radius:8px;
+    font-size:14px;color:var(--ink);margin-bottom:20px}
+  .footer{font-size:11px;color:var(--grey);margin-top:20px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Footprint 26</h1>
+    <div class="sub">Cost &amp; carbon of following a team across the first tri-nation World Cup, and how the number changes with how you count.</div>
+  </header>
+
+  <div class="lede" id="lede">Build a fan journey on the left. Watch how the same trip's carbon footprint shifts up to <b>~3&times;</b> depending only on the accounting method. This is the core of the World Cup sustainability dispute.</div>
+
+  <div class="grid">
+    <!-- Builder -->
+    <div class="card">
+      <h2>1 · Build a fan journey</h2>
+      <label>Where does the fan travel from?</label>
+      <select id="origin"></select>
+      <label>Matches attended (tap to toggle the venue sequence)</label>
+      <div class="seq" id="seq"></div>
+      <label>Nights per stop: <span id="nlabel">3</span></label>
+      <input type="range" id="nights" min="1" max="6" value="3"/>
+    </div>
+
+    <!-- Headline -->
+    <div class="card">
+      <h2>2 · This fan's footprint (realistic)</h2>
+      <div class="big" id="totalCo2">— <span class="unit">tCO₂e</span></div>
+      <div class="sub" id="kmline"></div>
+      <div style="margin-top:14px">
+        <div class="big" style="font-size:30px" id="cost">$—</div>
+        <div class="sub">estimated out-of-pocket (flights · ground · lodging)</div>
+      </div>
+      <div class="note" id="equiv"></div>
+    </div>
+
+    <!-- Accounting gap -->
+    <div class="card full">
+      <h2>3 · The accounting gap: same journey, three methods</h2>
+      <div class="bars" id="methodBars"></div>
+      <div class="note">FIFA-style strips out aviation radiative forcing and counts one-way legs (the optimistic framing criticised after Qatar 2022). Bottom-up counts round trips and non-CO₂ warming. The ratio between them is the headline finding.</div>
+    </div>
+
+    <!-- Net zero -->
+    <div class="card">
+      <h2>4 · Tournament rollup vs net-zero pathway</h2>
+      <div class="gauge-wrap">
+        <canvas id="gauge" width="260" height="150"></canvas>
+        <div class="big" id="rollupVal" style="font-size:28px">— <span class="unit">Mt CO₂e</span></div>
+        <div class="sub">fan travel + lodging only (a lower bound)</div>
+      </div>
+      <div class="note" id="nzNote"></div>
+    </div>
+
+    <!-- Host city efficiency -->
+    <div class="card">
+      <h2>5 · Host-city grid efficiency</h2>
+      <table id="cityTable"><thead><tr><th>City</th><th class="num">gCO₂/kWh</th><th>Grid</th></tr></thead><tbody></tbody></table>
+      <div class="note">Stadium-operations carbon depends heavily on local grid. Vancouver &amp; Seattle run near-zero hydro; Kansas City &amp; Texas are fossil-heavy.</div>
+    </div>
+  </div>
+
+  <div class="footer">Model ported from the Footprint 26 Python engine · real venue coordinates &amp; published emission factors · all assumptions auditable &amp; tunable · illustrative, not official.</div>
+</div>
+
+<script>
+// ---- Real venue reference data (mirrors data/reference/venues.csv) ----
+const VENUES = [
+  {id:"ATL",city:"Atlanta",cc:"USA",lat:33.7553,lon:-84.4006,grid:379},
+  {id:"ARL",city:"Dallas (Arlington)",cc:"USA",lat:32.7473,lon:-97.0945,grid:401},
+  {id:"NYNJ",city:"New York/New Jersey",cc:"USA",lat:40.8135,lon:-74.0745,grid:245},
+  {id:"LA",city:"Los Angeles",cc:"USA",lat:33.9535,lon:-118.3392,grid:221},
+  {id:"BOS",city:"Boston",cc:"USA",lat:42.0909,lon:-71.2643,grid:252},
+  {id:"SEA",city:"Seattle",cc:"USA",lat:47.5952,lon:-122.3316,grid:94},
+  {id:"MIA",city:"Miami",cc:"USA",lat:25.9580,lon:-80.2389,grid:401},
+  {id:"KC",city:"Kansas City",cc:"USA",lat:39.0489,lon:-94.4839,grid:512},
+  {id:"HOU",city:"Houston",cc:"USA",lat:29.6847,lon:-95.4107,grid:401},
+  {id:"PHI",city:"Philadelphia",cc:"USA",lat:39.9008,lon:-75.1675,grid:298},
+  {id:"SF",city:"SF Bay Area",cc:"USA",lat:37.4030,lon:-121.9700,grid:221},
+  {id:"MEX",city:"Mexico City",cc:"MEX",lat:19.3029,lon:-99.1505,grid:431},
+  {id:"GDL",city:"Guadalajara",cc:"MEX",lat:20.6817,lon:-103.4628,grid:431},
+  {id:"MTY",city:"Monterrey",cc:"MEX",lat:25.6694,lon:-100.2444,grid:431},
+  {id:"TOR",city:"Toronto",cc:"CAN",lat:43.6332,lon:-79.4185,grid:110},
+  {id:"VAN",city:"Vancouver",cc:"CAN",lat:49.2768,lon:-123.1119,grid:13},
+];
+const EF = {air_short:0.246, air_long:0.151, rail:0.035, rf:1.9, hotel:16.5};
+const COST = {air_km:0.12, ground_km:0.06, hotel:220};
+const GROUND_KM = 600;
+const ORIGINS = {
+  "Domestic (USA/CAN/MEX)":{km:1200,long:false},
+  "South America":{km:7500,long:true},
+  "Europe":{km:8200,long:true},
+  "Africa":{km:11000,long:true},
+  "Asia / Oceania":{km:12500,long:true},
+};
+// rollup segment shares (mirrors tournament_rollup.py)
+const SEGMENTS = [
+  {name:"Domestic (USA/CAN/MEX)",share:.55,km:1200,long:false,route:["LA","SEA","ARL"]},
+  {name:"South America",share:.12,km:7500,long:true,route:["MIA","ARL","NYNJ"]},
+  {name:"Europe",share:.20,km:8200,long:true,route:["TOR","BOS","NYNJ"]},
+  {name:"Africa",share:.05,km:11000,long:true,route:["MEX","HOU","ATL"]},
+  {name:"Asia / Oceania",share:.08,km:12500,long:true,route:["VAN","SF","LA"]},
+];
+const TOTAL_FANS = 2_500_000;
+const QATAR = 3.6;          // Mt CO2e reported
+const TARGET_2030 = 1.8;    // -50% interim
+const METHODS = {
+  fifa:{name:"FIFA-style (optimistic)",rf:false,round:false,color:"#7cb798"},
+  bottom:{name:"Bottom-up (realistic)",rf:true,round:true,color:"#1B7A4B"},
+  allfly:{name:"All-fly (upper bound)",rf:true,round:true,ground:false,color:"#B5651D"},
+};
+
+const R=6371.0088, rad=d=>d*Math.PI/180;
+function hav(a,b){
+  const dlat=rad(b.lat-a.lat),dlon=rad(b.lon-a.lon);
+  const x=Math.sin(dlat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dlon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+const V=Object.fromEntries(VENUES.map(v=>[v.id,v]));
+
+function legEmis(km,m){
+  if(km<=0)return 0;
+  let perKm,rf;
+  if(m.ground!==false && km<=GROUND_KM){perKm=EF.rail;rf=1;}
+  else{perKm=km<1500?EF.air_short:EF.air_long; rf=m.rf?1:(1/EF.rf);}
+  return km*perKm*rf*(m.round?2:1);
+}
+function simulate(originKm,long,seq,nights,m){
+  const oFactor=long?EF.air_long:EF.air_short;
+  const rf=m.rf?1:(1/EF.rf);
+  let travel=originKm*oFactor*rf*(m.round?2:1);
+  let cost=originKm*COST.air_km*(m.round?2:1);
+  let km=0;
+  for(let i=0;i<seq.length-1;i++){
+    const d=hav(V[seq[i]],V[seq[i+1]]); km+=d;
+    travel+=legEmis(d,m);
+    cost+=d*(d<=GROUND_KM?COST.ground_km:COST.air_km);
+  }
+  const nNights=nights*seq.length;
+  const hotel=nNights*EF.hotel;
+  cost+=nNights*COST.hotel;
+  return {travel,hotel,total:travel+hotel,km,cost};
+}
+
+// ---- state ----
+let seq=["TOR","MEX","SEA","ARL","MIA","NYNJ"];
+const origSel=document.getElementById("origin");
+Object.keys(ORIGINS).forEach(o=>{const x=document.createElement("option");x.value=o;x.textContent=o;origSel.appendChild(x);});
+origSel.value="Europe";
+
+const seqBox=document.getElementById("seq");
+function renderChips(){
+  seqBox.innerHTML="";
+  VENUES.forEach(v=>{
+    const on=seq.includes(v.id);
+    const c=document.createElement("span");
+    c.className="chip"+(on?"":" off");
+    c.textContent=v.city+(on?" · "+(seq.indexOf(v.id)+1):"");
+    c.onclick=()=>{ on?seq=seq.filter(x=>x!==v.id):seq.push(v.id); renderChips(); update(); };
+    seqBox.appendChild(c);
+  });
+}
+document.getElementById("nights").oninput=e=>{document.getElementById("nlabel").textContent=e.target.value;update();};
+origSel.onchange=update;
+
+function fmt(n,d=2){return n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+function drawGauge(ratio){
+  const c=document.getElementById("gauge"),ctx=c.getContext("2d");
+  ctx.clearRect(0,0,260,150);
+  const cx=130,cy=140,r=110;
+  // arc background
+  ctx.lineWidth=18;ctx.lineCap="round";
+  ctx.strokeStyle="#eef3f0";ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.stroke();
+  // fill proportional to ratio vs 4x target ceiling
+  const frac=Math.min(ratio/4,1);
+  const col=ratio<=1?"#1B7A4B":ratio<=2?"#B5651D":"#c0392b";
+  ctx.strokeStyle=col;ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,Math.PI+frac*Math.PI);ctx.stroke();
+  ctx.fillStyle=col;ctx.font="bold 22px sans-serif";ctx.textAlign="center";
+  ctx.fillText(fmt(ratio,1)+"×",cx,cy-18);
+  ctx.fillStyle="#5A6B62";ctx.font="11px sans-serif";
+  ctx.fillText("of 2030 interim target",cx,cy-2);
+}
+
+function update(){
+  const o=ORIGINS[origSel.value];
+  const nights=+document.getElementById("nights").value;
+  if(seq.length<1){document.getElementById("totalCo2").innerHTML="— <span class='unit'>tCO₂e</span>";return;}
+
+  const rB=simulate(o.km,o.long,seq,nights,METHODS.bottom);
+  const rF=simulate(o.km,o.long,seq,nights,METHODS.fifa);
+  const rA=simulate(o.km,o.long,seq,nights,METHODS.allfly);
+
+  document.getElementById("totalCo2").innerHTML=fmt(rB.total/1000)+" <span class='unit'>tCO₂e</span>";
+  document.getElementById("kmline").textContent=fmt(rB.km,0)+" km of intra-tournament travel · "+seq.length+" matches";
+  document.getElementById("cost").textContent="$"+fmt(rB.cost,0);
+  const gap=rB.total/rF.total;
+  const trees=Math.round(rB.total/21); // ~21 kg CO2/tree/yr
+  document.getElementById("equiv").innerHTML="≈ <b>"+gap.toFixed(1)+"×</b> the optimistic figure · equivalent to a year of carbon uptake by ~"+trees.toLocaleString()+" trees.";
+
+  // method bars
+  const max=Math.max(rB.total,rF.total,rA.total);
+  const bars=[["FIFA-style",rF.total,METHODS.fifa.color],["Bottom-up",rB.total,METHODS.bottom.color],["All-fly",rA.total,METHODS.allfly.color]];
+  document.getElementById("methodBars").innerHTML=bars.map(([l,v,c])=>
+    `<div class="bar-row"><div class="bar-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(1)}%;background:${c}"><span class="bar-val">${fmt(v/1000)} t</span></div></div></div>`
+  ).join("");
+
+  // rollup (fixed segments, independent of the builder)
+  let bu=0,ff=0;
+  SEGMENTS.forEach(s=>{
+    bu+=simulate(s.km,s.long,s.route,3,METHODS.bottom).total/1000*(TOTAL_FANS*s.share);
+    ff+=simulate(s.km,s.long,s.route,3,METHODS.fifa).total/1000*(TOTAL_FANS*s.share);
+  });
+  const buMt=bu/1e6;
+  document.getElementById("rollupVal").innerHTML=fmt(buMt)+" <span class='unit'>Mt CO₂e</span>";
+  drawGauge(buMt/TARGET_2030);
+  document.getElementById("nzNote").innerHTML=
+    `That is <b>${fmt(buMt/QATAR,1)}×</b> Qatar 2022's entire <i>reported</i> footprint (${QATAR} Mt) and <b>${fmt(buMt/TARGET_2030,1)}×</b> the level FIFA's −50%-by-2030 pledge implies, fan transport alone. Net zero by 2040 would require offsetting or eliminating all of it.`;
+}
+
+// city table
+const ct=document.querySelector("#cityTable tbody");
+[...VENUES].sort((a,b)=>a.grid-b.grid).forEach(v=>{
+  const clean=v.grid<150, mid=v.grid<350;
+  const color=clean?"#1B7A4B":mid?"#B5651D":"#c0392b";
+  const lab=clean?"clean":mid?"mixed":"fossil-heavy";
+  ct.innerHTML+=`<tr><td>${v.city}</td><td class="num">${v.grid}</td><td><span class="pill" style="background:${color}22;color:${color}">${lab}</span></td></tr>`;
+});
+
+renderChips();
+update();
+</script>
+</body>
+</html>

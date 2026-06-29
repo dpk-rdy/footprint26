@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "footprint26"
+version = "1.0.0"
+description = "Fan cost & carbon model for the 2026 FIFA World Cup"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["numpy>=1.26", "pandas>=2.2", "matplotlib>=3.9"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2", "jupyter>=1.0", "nbconvert>=7.0", "ruff>=0.4"]
+
+[tool.setuptools]
+packages = ["footprint26"]
+
+[tool.ruff]
+line-length = 100
