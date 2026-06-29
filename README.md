@@ -4,10 +4,6 @@
 
 The model is bottom-up and transparent: it uses real stadium coordinates, the confirmed 104-match allocation, and published emission factors, and reports results under three accounting methodologies so the effect of accounting choices is explicit rather than hidden.
 
-→ **Read the findings:** [`Findings.md`](Findings.md) ([rendered HTML with charts](docs/Findings.html))
-→ **Run the analysis:** [`Footprint26.ipynb`](Footprint26.ipynb) ([static preview](docs/Footprint26_preview.html))
-→ **Explore interactively:** [`docs/dashboard.html`](docs/dashboard.html)
-
 ---
 
 ## Headline results
